@@ -1,13 +1,24 @@
+CREATE TABLE "User" (
+    id SERIAL PRIMARY KEY,
+    first_name TEXT NOT NULL,
+    middle_name TEXT NOT NULL,
+    last_name TEXT NOT NULL,
+    email TEXT NOT NULL,
+    password TEXT NOT NULL,
+    phone_number TEXT NOT NULL
+);
+
+
 CREATE TABLE SecureFile (
     id TEXT PRIMARY KEY,
     filename TEXT NOT NULL,
     file_data BYTEA NOT NULL,
     original_id BIGINT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW(),,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     user_id INT NOT NULL,
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
-        REFERENCES User(id)
+        REFERENCES "User"(id)
 );
 
 
@@ -18,20 +29,8 @@ CREATE TABLE SuperSecret (
     user_id INT NOT NULL,
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
-        REFERENCES User(id)
+        REFERENCES "User"(id)
 );
-
-
-CREATE TABLE User (
-    id SERIAL PRIMARY KEY,
-    first_name TEXT NOT NULL,
-    middle_name TEXT NOT NULL,
-    last_name TEXT NOT NULL,
-    email TEXT NOT NULL,
-    password TEXT NOT NULL,
-    phone_number TEXT NOT NULL
-);
-
 
 CREATE TABLE FileSharing (
     id SERIAL PRIMARY KEY,
@@ -44,10 +43,10 @@ CREATE TABLE FileSharing (
         REFERENCES SecureFile(id),
     CONSTRAINT fk_sender
         FOREIGN KEY(sender_id)
-        REFERENCES User(id),
+        REFERENCES "User"(id),
     CONSTRAINT fk_recipient
         FOREIGN KEY(recipient_id)
-        REFERENCES User(id)
+        REFERENCES "User"(id)
 );
 
 
@@ -59,13 +58,13 @@ CREATE TABLE SecretSharing (
     shared_at TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_secret
         FOREIGN KEY(secret_id)
-        REFERENCES SuperSecret(id)
+        REFERENCES SuperSecret(id),
     CONSTRAINT fk_sender
         FOREIGN KEY(sender_id)
-        REFERENCES User(id),
+        REFERENCES "User"(id),
     CONSTRAINT fk_receiver
         FOREIGN KEY(recipient_id)
-        REFERENCES User(id)
+        REFERENCES "User"(id)
 );
 
 
@@ -74,7 +73,7 @@ CREATE TABLE SecretFileCount (
     user_id INT NOT NULL,
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
-        REFERENCES User(id)
+        REFERENCES "User"(id)
 );
 
 CREATE TABLE SecretPasswordCount (
@@ -82,5 +81,5 @@ CREATE TABLE SecretPasswordCount (
     user_id INT NOT NULL,
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
-        REFERENCES User(id)
+        REFERENCES "User"(id)
 );
