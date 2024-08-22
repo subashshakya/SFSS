@@ -16,8 +16,11 @@ import (
 const internalServerError = "Internal Server Error"
 const invalidInput = "Invalid data input"
 
-func UserSignUp(c *gin.Context) {
+func init() {
 	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
+}
+
+func UserSignUp(c *gin.Context) {
 	var newUser models.User
 	if err := c.ShouldBindJSON(&newUser); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": invalidInput})
@@ -43,11 +46,11 @@ func UserSignUp(c *gin.Context) {
 }
 
 func UserSignIn(c *gin.Context) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		log.Printf("\nError ====> %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": invalidInput})
+		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -55,30 +58,34 @@ func UserSignIn(c *gin.Context) {
 	if err != nil {
 		log.Printf("\nError ====> %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": internalServerError})
+		return
 	}
 	if !isPresent {
 		log.Println("User not found")
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "Could not match user credentials."})
+		return
 	}
 	token, tokenError := utils.GenerateToken(user.Id)
 	if tokenError != nil || token == "" {
 		log.Printf("\nError ====> %v\n", tokenError)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Could not generate token", "error": tokenError})
+		return
 	}
 	log.Println("Sign-In successful")
 	c.JSON(http.StatusAccepted, gin.H{"success": true, "message": "Sign-In Successful", "token": token})
 }
 
 func GetUser(c *gin.Context) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	id, err := strconv.ParseUint(c.Param("id"), 10, 0)
 	if id == 0 {
 		log.Println("ID is zero")
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": invalidInput})
+		return
 	}
 	if err != nil {
 		log.Printf("\nError ====> %v\n", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": "Could not parse user id"})
+		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -86,17 +93,18 @@ func GetUser(c *gin.Context) {
 	if dbErr != nil {
 		log.Printf("\nError ====> %v\n", dbErr)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": internalServerError})
+		return
 	}
 	log.Println("User request successful")
 	c.JSON(http.StatusOK, gin.H{"success": true, "message": "The requested user is fetched successfully", "data": dbUser})
 }
 
 func UpdateUser(c *gin.Context) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		log.Printf("\nError ====> %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": invalidInput})
+		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -104,26 +112,29 @@ func UpdateUser(c *gin.Context) {
 	if !isUserInDB {
 		log.Println("User not found")
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "User not found for modification"})
+		return
 	}
 	isUpdated, error := orms.UpdateUser(ctx, &user)
 	if error != nil {
 		log.Printf("\nError ====> %v\n", error)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": internalServerError})
+		return
 	}
 	if !isUpdated {
 		log.Println("User not updated")
 		c.JSON(http.StatusNotModified, gin.H{"success": false, "message": "Data not modified"})
+		return
 	}
 	log.Println("User updated successfully")
 	c.JSON(http.StatusAccepted, gin.H{"success": true, "message": "User updated successfully"})
 }
 
 func DeleteUser(c *gin.Context) {
-	log.SetFlags(log.Ldate | log.Ltime | log.Lshortfile)
 	var user models.User
 	if err := c.ShouldBindJSON(&user); err != nil {
 		log.Printf("\nError ====> %v\n", err)
 		c.JSON(http.StatusBadRequest, gin.H{"success": false, "message": invalidInput})
+		return
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -131,15 +142,18 @@ func DeleteUser(c *gin.Context) {
 	if !isUserInDB {
 		log.Println("User not found")
 		c.JSON(http.StatusNotFound, gin.H{"success": false, "message": "User not found for modification"})
+		return
 	}
 	deleteSuccess, error := orms.DeleteUser(ctx, &user)
 	if error != nil {
 		log.Printf("\nError ====> %v\n", error)
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": internalServerError})
+		return
 	}
 	if !deleteSuccess {
 		log.Println("Could not delete user")
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"success": false, "message": "Could not process the requested process"})
+		return
 	}
 	log.Println("User deleted successfully")
 	c.JSON(http.StatusAccepted, gin.H{"success": true, "message": "Successfully deleted the user"})
