@@ -45,8 +45,8 @@ type SuperSecret struct {
 }
 
 func (ss *SuperSecret) BeforeCreate(tx *gorm.DB) (err error) {
-	if ss.Id == '' {
-		ss.Id ==uuid.New().String()
+	if ss.Id == "" {
+		ss.Id = uuid.New().String()
 	}
 	return
 }
