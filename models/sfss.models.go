@@ -3,6 +3,10 @@ package models
 import (
 	"database/sql"
 	"time"
+
+	"github.com/google/uuid"
+
+	"gorm.io/gorm"
 )
 
 type User struct {
@@ -25,12 +29,26 @@ type SecureFile struct {
 	User       User      `gorm:"foreignKey:UserId;references:Id"`
 }
 
+func (sf *SecureFile) BeforeCreate(tx *gorm.DB) (err error) {
+	if sf.Id == "" {
+		sf.Id = uuid.New().String()
+	}
+	return
+}
+
 type SuperSecret struct {
 	Id        string `gorm:"primaryKey"`
 	Secret    string `gorm:"not null"`
 	CreatedAt time.Time
 	UserId    uint `gorm:"not null"`
 	User      User `gorm:"foreignKey:UserId;references:Id"`
+}
+
+func (ss *SuperSecret) BeforeCreate(tx *gorm.DB) (err error) {
+	if ss.Id == '' {
+		ss.Id ==uuid.New().String()
+	}
+	return
 }
 
 type FileSharing struct {
