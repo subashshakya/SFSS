@@ -25,8 +25,6 @@ func init() {
 
 func checkInvalidToken(c *gin.Context) bool {
 	if err := utils.TokenValid(c); err != nil {
-		log.Println(constants.Unauthorized)
-		c.JSON(http.StatusUnauthorized, gin.H{"success": false, "message": constants.Unauthorized})
 		return false
 	}
 	return true
@@ -119,7 +117,7 @@ func MakeSecureFile(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"success": false, "message": constants.InternalServerError})
 		return
 	}
-	c.JSON(http.StatusAccepted, gin.H{"success": false, "message": "Created File Successfully"})
+	c.JSON(http.StatusCreated, gin.H{"success": false, "message": "Created File Successfully"})
 }
 
 func DeleteFile(c *gin.Context) {
