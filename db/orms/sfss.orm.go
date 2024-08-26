@@ -139,6 +139,12 @@ func GetSecrect(ctx context.Context, secretId string) (*models.SuperSecret, erro
 	return &supaSecret, nil
 }
 
+func IsSecretAvailable(ctx context.Context, secretId string) bool {
+	var supaSecret models.SuperSecret
+	result := DatabaseConnection.WithContext(ctx).Where("Id = ?", secretId).Find(&supaSecret)
+	return result.Error != nil
+}
+
 func UpdateSuperSecret(ctx context.Context, supaSecret *models.SuperSecret) (bool, error) {
 	result := DatabaseConnection.WithContext(ctx).Save(&supaSecret)
 	if result.Error != nil {
