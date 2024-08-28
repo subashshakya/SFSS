@@ -220,8 +220,8 @@ func ShareSecret(ctx context.Context, secretShare *models.SecretSharing) error {
 	return err
 }
 
-func GetSecretSharesOfAUser(ctx context.Context, senderId uint) ([]*models.FileSharing, error) {
-	var secretSharedForUser []*models.FileSharing
+func GetSecretSharesOfAUser(ctx context.Context, senderId uint) ([]*models.SecretSharing, error) {
+	var secretSharedForUser []*models.SecretSharing
 	result := DatabaseConnection.WithContext(ctx).Where("SenderId = ?", senderId).Find(&secretSharedForUser)
 	if result.Error != nil {
 		return nil, result.Error
