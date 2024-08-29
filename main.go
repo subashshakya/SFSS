@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/subashshakya/SFSS/db/connection"
 	"github.com/subashshakya/SFSS/db/orms"
+	router "github.com/subashshakya/SFSS/routes"
 )
 
 func main() {
@@ -17,6 +18,7 @@ func main() {
 	db, err := connection.CreateDatabaseConnection()
 	r := gin.Default()
 	r.Use()
+	router.SetupRoutes(r)
 	if err == nil {
 		fmt.Println("DB Connection Successful")
 	} else {
