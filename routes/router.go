@@ -13,7 +13,7 @@ func SetupRoutes(router *gin.Engine) {
 		fileRoutes.GET("/fetch_all/:id", controllers.GetUserFiles)
 		fileRoutes.PATCH("/update", controllers.UpdateSecureFile)
 		fileRoutes.POST("/create", controllers.MakeSecureFile)
-		fileRoutes.DELETE("/delete", controllers.DeleteFile)
+		fileRoutes.DELETE("/delete/:id", controllers.DeleteFile)
 		fileRoutes.GET("/:id", controllers.GetSecureFileByID)
 	}
 
@@ -22,7 +22,7 @@ func SetupRoutes(router *gin.Engine) {
 		secretRoutes.POST("/create", controllers.CreateSuperSecret)
 		secretRoutes.GET("/:id", controllers.ReadSuperSecret)
 		secretRoutes.PATCH("/update", controllers.UpdatedSuperSecret)
-		secretRoutes.DELETE("/delete", controllers.DeleteSuperSecret)
+		secretRoutes.DELETE("/delete/:id", controllers.DeleteSuperSecret)
 		secretRoutes.GET("/fetch_all/:id", controllers.GetSuperSecretsForUser)
 	}
 
